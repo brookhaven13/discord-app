@@ -1,36 +1,48 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## Getting Started
+# Discord Web App Clone
 
-First, run the development server:
+This project aims to create a feature-rich clone of the Discord web application. Our goal is to recreate the core functionality and user experience of Discord while providing developers with an opportunity to learn and practice full-stack web development.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Key Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+-   User authentication system (sign up, login, logout)
+-   Real-time chat functionality
+-   Server creation and management
+-   Channel creation and joining
+-   Direct messaging
+-   User profiles and settings
+-   Voice and video call functionality (optional)
+-   File and image upload capabilities
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Tech Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+-   **Frontend:** React.js, Redux, WebSocket
+-   **Backend:** Node.js, Express.js
+-   **Database:** MongoDB
+-   **Real-time communication:** Socket.io
+-   **Authentication:** JWT (JSON Web Tokens)
 
-## Learn More
+## Learning Objectives
 
-To learn more about Next.js, take a look at the following resources:
+Through this project, we aim to:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1.  Gain a deep understanding of modern web application architecture
+2.  Practice frontend and backend separation
+3.  Master real-time communication technologies
+4.  Improve UI/UX design skills
+5.  Learn to handle large-scale user data and high concurrency scenarios
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Next Steps
 
-## Deploy on Vercel
+1.  Design data models and APIs
+2.  Implement basic user interface
+3.  Develop core chat functionality
+4.  Gradually add other features
+5.  Optimize performance and user experience
+6.  Conduct security testing and improvements
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+This project is not only a tribute to Discord but also an excellent opportunity to comprehensively enhance web development skills.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
