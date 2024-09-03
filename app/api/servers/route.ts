@@ -10,13 +10,14 @@ export async function POST(req: Request) {
     const { name, imageUrl } = await req.json();
     const profile = await currentProfile();
 
+    console.log("[SERVERS_POST_PROFILE]",profile)
+
     if (!profile) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
     const server = await db.server.create({
       data: {
-        userId: profile.userId,
         profileId: profile.id,
         name,
         imageUrl,
