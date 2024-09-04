@@ -1,9 +1,10 @@
 "use client";
 
-import axios from "axios";
 import { useState } from "react";
 import { useModal } from "@/hooks/use-modal-store";
 import { ServerWithMembersWithProfiles } from "@/types";
+import { MemberRole } from "@prisma/client";
+import qs from "query-string";
 import {
   Check,
   Gavel,
@@ -36,6 +37,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { UserAvatar } from "@/components/user-avatar";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 const roleIconMap = {
   GUEST: null,
@@ -44,11 +47,34 @@ const roleIconMap = {
 };
 
 export const MembersModal = () => {
+  const router = useRouter();
   const { isOpen, onOpen, onClose, type, data } = useModal();
   const [loadingId, setLoadingId] = useState("");
 
   const isModalOpen = isOpen && type === "members";
   const { server } = data as { server: ServerWithMembersWithProfiles };
+
+  const onRoleChange = async (memberId: string, role: MemberRole) => {
+    try {
+      setLoadingId(memberId);
+
+      const url = qs.stringifyUrl({
+        url: `/api/members/${memberId}`,
+        query: {
+          serverId: server?.id,
+        }
+      });
+
+      const response = await axios.patch(url, { role });
+
+      router.refresh();
+      onOpen("members", { server: response.data });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoadingId("");
+    }
+  };
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
@@ -87,12 +113,12 @@ export const MembersModal = () => {
                           </DropdownMenuSubTrigger>
                           <DropdownMenuPortal>
                             <DropdownMenuSubContent>
-                              <DropdownMenuItem className="flex items-center gap-2">
+                              <DropdownMenuItem onClick={() => onRoleChange(member.id, "GUEST")} className="flex items-center gap-2">
                                 <Shield size={16} />
                                 Guest
                                 {member.role === "GUEST" && <Check size={16} />}
                               </DropdownMenuItem>
-                              <DropdownMenuItem className="flex items-center gap-2">
+                              <DropdownMenuItem onClick={() => onRoleChange(member.id, "MODERATOR")} className="flex items-center gap-2">
                                 <ShieldCheck size={16} />
                                 Moderator
                                 {member.role === "MODERATOR" && <Check size={16} />}
