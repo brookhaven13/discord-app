@@ -44,6 +44,18 @@ const ServerSearch = ({ data }: ServerSearchProps) => {
     return () => document.removeEventListener("keydown", keyDown);
   }, []);
 
+  const handleClick = ({ id, type }: { id: string, type: "channel" | "member"}) => {
+    setOpen(false);
+    
+    if (type === "member") {
+      return router.push(`/servers/${params.serverId}/conversations/${id}`);
+    }
+
+    if (type === "channel") {
+      return router.push(`/servers/${params.serverId}/channels/${id}`);
+    }
+  }
+
   return (
     <>
       <button
@@ -72,11 +84,11 @@ const ServerSearch = ({ data }: ServerSearchProps) => {
               <CommandGroup key={label} heading={label}>
                 {data?.map(({ id, icon, name}) => {
                   return (
-                    <CommandItem key={id}>
+                    <CommandItem key={id} onSelect={() => handleClick({ id, type })}>
                       {icon}
                       <span>{name}</span>
                     </CommandItem>
-                  )
+                  );
                 })}
               </CommandGroup>
             )
