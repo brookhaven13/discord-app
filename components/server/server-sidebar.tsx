@@ -2,7 +2,8 @@ import { redirect } from "next/navigation";
 import { ChannelType, MemberRole } from "@prisma/client";
 import { currentProfile } from "@/lib/current-profile";
 import { db } from "@/lib/db";
-import { Hash, Mic, ShieldAlert, ShieldCheck, Video } from "lucide-react";
+import { channelIconMap, roleIconMap } from "@/lib/icon-maps";
+
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 
@@ -15,20 +16,6 @@ import ServerMember from "./server-member";
 interface ServerSidebarProps {
   serverId: string;
 }
-
-const iconMap = {
-  [ChannelType.TEXT]: <Hash className="mr-2 h-4 w-4" />,
-  [ChannelType.AUDIO]: <Mic className="mr-2 h-4 w-4" />,
-  [ChannelType.VIDEO]: <Video className="mr-2 h-4 w-4" />,
-};
-
-const roleIconMap = {
-  [MemberRole.GUEST]: null,
-  [MemberRole.MODERATOR]: (
-    <ShieldCheck className="mr-2 h-4 w-4 text-indigo-500" />
-  ),
-  [MemberRole.ADMIN]: <ShieldAlert className="mr-2 h-4 w-4 text-rose-500" />,
-};
 
 const ServerSidebar = async ({ serverId }: ServerSidebarProps) => {
   const profile = await currentProfile();
@@ -88,7 +75,7 @@ const ServerSidebar = async ({ serverId }: ServerSidebarProps) => {
                 label: "Text Channels",
                 type: "channel",
                 data: textChannels?.map((channel) => ({
-                  icon: iconMap[channel.type],
+                  icon: channelIconMap[channel.type],
                   name: channel.name,
                   id: channel.id,
                 })),
@@ -97,7 +84,7 @@ const ServerSidebar = async ({ serverId }: ServerSidebarProps) => {
                 label: "Audio Channels",
                 type: "channel",
                 data: audioChannels?.map((channel) => ({
-                  icon: iconMap[channel.type],
+                  icon: channelIconMap[channel.type],
                   name: channel.name,
                   id: channel.id,
                 })),
@@ -106,7 +93,7 @@ const ServerSidebar = async ({ serverId }: ServerSidebarProps) => {
                 label: "Video Channels",
                 type: "channel",
                 data: videoChannels?.map((channel) => ({
-                  icon: iconMap[channel.type],
+                  icon: channelIconMap[channel.type],
                   name: channel.name,
                   id: channel.id,
                 })),
@@ -197,7 +184,11 @@ const ServerSidebar = async ({ serverId }: ServerSidebarProps) => {
             />
 
             {members.map((member) => (
-              <ServerMember />
+              <ServerMember
+                key={member.id}
+                member={member}
+                server={server}
+              />
             ))}
           </div>
         )}

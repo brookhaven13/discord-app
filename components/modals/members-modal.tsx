@@ -1,17 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { useModal } from "@/hooks/use-modal-store";
-import { ServerWithMembersWithProfiles } from "@/types";
+import { useRouter } from "next/navigation";
 import { MemberRole } from "@prisma/client";
+import axios from "axios";
+import { ServerWithMembersWithProfiles } from "@/types";
 import qs from "query-string";
+import { roleIconMap } from "@/lib/icon-maps";
+import { useModal } from "@/hooks/use-modal-store";
+
 import {
   Check,
   Gavel,
   Loader2,
   MoreVertical,
   Shield,
-  ShieldAlert,
   ShieldCheck,
   ShieldQuestion,
 } from "lucide-react";
@@ -37,14 +40,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { UserAvatar } from "@/components/user-avatar";
-import axios from "axios";
-import { useRouter } from "next/navigation";
-
-const roleIconMap = {
-  GUEST: null,
-  MODERATOR: <ShieldCheck className="h-4 w-4 text-indigo-500" />,
-  ADMIN: <ShieldAlert className="h-4 w-4 text-rose-500" />,
-};
 
 export const MembersModal = () => {
   const router = useRouter();
