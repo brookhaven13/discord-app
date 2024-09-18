@@ -9,6 +9,8 @@ import { Separator } from "@/components/ui/separator";
 import ServerHeader from "./server-header";
 import ServerSearch from "./server-search";
 import ServerSection from "./server-section";
+import ServerChannel from "./server-channel";
+import ServerMember from "./server-member";
 
 interface ServerSidebarProps {
   serverId: string;
@@ -18,17 +20,17 @@ const iconMap = {
   [ChannelType.TEXT]: <Hash className="mr-2 h-4 w-4" />,
   [ChannelType.AUDIO]: <Mic className="mr-2 h-4 w-4" />,
   [ChannelType.VIDEO]: <Video className="mr-2 h-4 w-4" />,
-}
+};
 
 const roleIconMap = {
   [MemberRole.GUEST]: null,
-  [MemberRole.MODERATOR]: <ShieldCheck className="mr-2 h-4 w-4 text-indigo-500" />,
+  [MemberRole.MODERATOR]: (
+    <ShieldCheck className="mr-2 h-4 w-4 text-indigo-500" />
+  ),
   [MemberRole.ADMIN]: <ShieldAlert className="mr-2 h-4 w-4 text-rose-500" />,
-}
+};
 
-const ServerSidebar = async ({
-  serverId
-}: ServerSidebarProps) => {
+const ServerSidebar = async ({ serverId }: ServerSidebarProps) => {
   const profile = await currentProfile();
 
   if (!profile) {
@@ -43,29 +45,37 @@ const ServerSidebar = async ({
       channels: {
         orderBy: {
           createdAt: "asc",
-        }
+        },
       },
       members: {
         include: {
-          profile: true
+          profile: true,
         },
         orderBy: {
           role: "asc",
-        }
-      }
-    }
+        },
+      },
+    },
   });
 
+  const textChannels = server?.channels.filter(
+    (channel) => channel.type === ChannelType.TEXT
+  );
+  const audioChannels = server?.channels.filter(
+    (channel) => channel.type === ChannelType.AUDIO
+  );
+  const videoChannels = server?.channels.filter(
+    (channel) => channel.type === ChannelType.VIDEO
+  );
+  const members = server?.members.filter(
+    (member) => member.profileId !== profile.id
+  );
 
-  const textChannels = server?.channels.filter((channel) => channel.type === ChannelType.TEXT);
-  const audioChannels = server?.channels.filter((channel) => channel.type === ChannelType.AUDIO);
-  const videoChannels = server?.channels.filter((channel) => channel.type === ChannelType.VIDEO);
-  const members = server?.members.filter((member) => member.profileId !== profile.id);
-  
   if (!server) return redirect("/");
 
-  const role = server.members.find((member) => member.profileId === profile.id)?.role;
-  
+  const role = server.members.find(
+    (member) => member.profileId === profile.id
+  )?.role;
 
   return (
     <div className="flex flex-col h-full w-full text-primary dark:bg-[#2b2d31] bg-zinc-100">
@@ -116,17 +126,84 @@ const ServerSidebar = async ({
         <Separator className="bg-zinc-200 dark:bg-zinc-700 rounded-md my-2" />
         {!!textChannels?.length && (
           <div className="mb-2">
-            <ServerSection 
-              label="Text Channels" 
-              sectionType="channel" 
+            <ServerSection
+              label="Text Channels"
+              sectionType="channels"
               channelType={ChannelType.TEXT}
               role={role}
             />
+
+            <div className="space-y-[2px]">
+              {textChannels.map((channel) => (
+                <ServerChannel
+                  key={channel.id}
+                  channel={channel}
+                  server={server}
+                  role={role}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+        {!!audioChannels?.length && (
+          <div className="mb-2">
+            <ServerSection
+              label="Text Channels"
+              sectionType="channels"
+              channelType={ChannelType.TEXT}
+              role={role}
+            />
+
+            <div className="space-y-[2px]">
+              {audioChannels.map((channel) => (
+                <ServerChannel
+                  key={channel.id}
+                  channel={channel}
+                  server={server}
+                  role={role}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+        {!!videoChannels?.length && (
+          <div className="mb-2">
+            <ServerSection
+              label="Text Channels"
+              sectionType="channels"
+              channelType={ChannelType.TEXT}
+              role={role}
+            />
+
+            <div className="space-y-[2px]">
+              {videoChannels.map((channel) => (
+                <ServerChannel
+                  key={channel.id}
+                  channel={channel}
+                  server={server}
+                  role={role}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+        {!!members?.length && (
+          <div className="mb-2">
+            <ServerSection
+              label="Members"
+              sectionType="members"
+              role={role}
+              server={server}
+            />
+
+            {members.map((member) => (
+              <ServerMember />
+            ))}
           </div>
         )}
       </ScrollArea>
     </div>
   );
-}
+};
 
 export default ServerSidebar;
