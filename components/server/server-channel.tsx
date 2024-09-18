@@ -18,7 +18,7 @@ const ServerChannel = ({ channel, server, role }: ServerChannelProps) => {
   const params = useParams();
   const router = useRouter();
 
-  const Icon = channelIconMap[channel.type];
+  const icon = channelIconMap[channel.type];
 
   return (
     <div
@@ -28,7 +28,7 @@ const ServerChannel = ({ channel, server, role }: ServerChannelProps) => {
       )}
     >
       <span className="flex-shrink-0 text-zinc-500 dark:text-zinc-400 h-5 w-5">
-        {Icon}
+        {icon}
       </span>
 
       <p
