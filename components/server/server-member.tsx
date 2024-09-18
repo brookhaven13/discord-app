@@ -1,3 +1,5 @@
+"use client";
+
 import React from 'react';
 import { Member, Profile, Server } from '@prisma/client';
 import { useParams, useRouter } from "next/navigation";
