@@ -45,10 +45,9 @@ const formSchema = z.object({
 export const EditChannelModal = () => {
   const { isOpen, onClose, type, data } = useModal();
   const router = useRouter();
-  const params = useParams();
 
   const isModalOpen = isOpen && type === "editChannel";
-  const { channelType } = data as { channelType: ChannelType };
+  const { channel, server } = data;
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -63,9 +62,9 @@ export const EditChannelModal = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       const url = qs.stringifyUrl({
-        url: "/api/channels",
+        url: "/api/channels/${channel.id}",
         query: {
-          serverId: params?.serverId
+          serverId: server?.id
         },
       });
       await axios.post(url, values);
@@ -84,19 +83,18 @@ export const EditChannelModal = () => {
   };
 
   useEffect(() => {
-    if (channelType) {
-      form.setValue("type", channelType);
-    } else {
-      form.setValue("type", ChannelType.TEXT);
+    if (channel) {
+      form.setValue("name", channel.name);
+      form.setValue("type", channel.type);
     }
-  }, [channelType, form]);
+  }, [channel, form]);
 
   return (
     <Dialog open={isModalOpen} onOpenChange={handleClose}>
       <DialogContent className="bg-white text-black p-0 overflow-hidden">
         <DialogHeader className="pt-8 px-6">
           <DialogTitle className="text-2xl text-center font-bold">
-            Create Channel
+            Edit Channel
           </DialogTitle>
         </DialogHeader>
         <Form {...form}>
