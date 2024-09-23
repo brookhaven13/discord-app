@@ -42,19 +42,19 @@ const formSchema = z.object({
   type: z.any().refine((type) => Object.values(ChannelType).includes(type)),
 });
 
-export const CreateChannelModal = () => {
+export const EditChannelModal = () => {
   const { isOpen, onClose, type, data } = useModal();
   const router = useRouter();
   const params = useParams();
 
-  const isModalOpen = isOpen && type === "createChannel";
-  const { channelType } = data;
+  const isModalOpen = isOpen && type === "editChannel";
+  const { channelType } = data as { channelType: ChannelType };
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      type: "",
+      type: "", // Set a default valid ChannelType
     },
   });
 
@@ -158,7 +158,7 @@ export const CreateChannelModal = () => {
             </div>
             <DialogFooter className="bg-gray-100 px-6 py-4">
               <Button variant="primary" type="submit" disabled={isLoading}>
-                Create
+                Save
               </Button>
             </DialogFooter>
           </form>
