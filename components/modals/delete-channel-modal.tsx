@@ -13,7 +13,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { channelIconMap } from "@/lib/icon-maps";
 import queryString from "query-string";
 
@@ -36,9 +36,8 @@ export const DeleteChannelModal = () => {
 
       await axios.delete(url);
 
-      onClose();
       router.refresh();
-      router.push(`/servers/${server?.id}`);
+      onClose();
     } catch (error) {
       console.log(error);
     } finally {

@@ -24,13 +24,18 @@ const ServerSection = ({
 }: ServerSectionProps) => {
   const { onOpen } = useModal();
 
+  const handleCreateChannel = () => {
+    console.log("create channel", channelType);
+    onOpen("createChannel", { channelType });
+  };
+
   return (
     <div className="flex items-center justify-between py-2">
       <div className="text-xs uppercase font-semibold text-zinc-500 dark:text-zinc-400">{label}</div>
       {role !== MemberRole.GUEST && sectionType === "channels" && (
         <ActionTooltip label="Create Channel" side="top" >
           <div 
-            onClick={() => onOpen("createChannel", { channelType })}
+            onClick={handleCreateChannel}
             className="text-zinc-500 hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-300 transition"
           >
             <Plus className="h-4 w-4" />

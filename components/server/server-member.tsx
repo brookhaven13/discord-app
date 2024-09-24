@@ -29,7 +29,7 @@ const ServerMember = ({
       )}
     >
       <UserAvatar src={member.profile.imageUrl} className="h-8 w-8" />
-      <p
+      <span
         className={cn(
           "font-semibold text-sm text-zinc-500 group-hover:text-zinc-600 dark:text-zinc-400 dark:group-hover:text-zinc-300 transition",
           params?.channelId === member.id &&
@@ -37,7 +37,7 @@ const ServerMember = ({
         )}
       >
         {member.profile.name}
-      </p>
+      </span>
       <span>{icon}</span>
     </button>
   );
