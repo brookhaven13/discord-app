@@ -25,7 +25,6 @@ const ServerSection = ({
   const { onOpen } = useModal();
 
   const handleCreateChannel = () => {
-    console.log("create channel", channelType);
     onOpen("createChannel", { channelType });
   };
 
