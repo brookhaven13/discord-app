@@ -1,5 +1,5 @@
 import { Server as NetServer } from "http";
-import { Server as IOServer } from "socket.io";
+import { Server as ServerIO } from "socket.io";
 import { NextApiRequest } from "next";
 
 import { NextApiResponseServerIo } from "@/types";
@@ -14,8 +14,8 @@ const ioHandler = (req: NextApiRequest, res: NextApiResponseServerIo) => {
    if (!res.socket.server.io) {
     const path = "/api/socket/io";
     const httpServer: NetServer = res.socket.server as any;
-    const io = new IOServer(httpServer, {
-      path,
+    const io = new ServerIO(httpServer, {
+      path: path,
       addTrailingSlash: false,
     });
 
