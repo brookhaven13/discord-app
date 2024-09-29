@@ -1,9 +1,10 @@
 "use client";
 
-import { Member } from "@prisma/client";
+import { Member, Message, Profile } from "@prisma/client";
 import { ChatWelcome } from "@/components/chat/chat-welcome";
 import { useChatQuery } from "@/hooks/use-chat-query";
 import { Loader2, ServerCrash } from "lucide-react";
+import { Fragment } from "react";
 
 interface ChatMessagesProps {
   name: string;
@@ -16,6 +17,12 @@ interface ChatMessagesProps {
   paramValue: string;
   type: "channel" | "conversation";
 }
+
+type MessageWithMemberWithProfile = Message & {
+  member: Member & {
+    profile: Profile;
+  };
+};
 
 export const ChatMessages = ({
   name,
@@ -30,12 +37,7 @@ export const ChatMessages = ({
 }: ChatMessagesProps) => {
   const queryKey = `chat:${chatId}`;
 
-  const {
-    data,
-    fetchNextPage,
-    isFetchingNextPage,
-    status,
-  } = useChatQuery({
+  const { data, fetchNextPage, isFetchingNextPage, status } = useChatQuery({
     queryKey,
     apiUrl,
     paramKey,
@@ -44,35 +46,40 @@ export const ChatMessages = ({
 
   if (status === "pending") {
     return (
-      <div className="flex flex-col flex-1 justify-center">
+      <div className="flex flex-col flex-1 items-center justify-center">
         <Loader2 className="h-7 w-7 text-zinc-500 animate-spin my-4" />
 
         <p className="text-sm text-zinc-500 dark:text-zinc-400">
           Loading messages...
         </p>
       </div>
-    )
+    );
   }
 
   if (status === "error") {
     return (
-      <div className="flex flex-col flex-1 justify-center">
+      <div className="flex flex-col flex-1 items-center justify-center">
         <ServerCrash className="h-7 w-7 text-zinc-500 my-4" />
         <p className="text-sm text-zinc-500 dark:text-zinc-400">
           Something went wrong. Please try again later.
         </p>
       </div>
-    )
+    );
   }
-
 
   return (
     <div className="flex flex-1 flex-col py-4 overflow-y-auto">
       <div className="flex-1" />
-      <ChatWelcome
-        type={type}
-        name={name}
-       />
+      <ChatWelcome type={type} name={name} />
+      <div className="flex flex-col-reverse mt-auto">
+        {data?.pages?.map((group, i) => (
+          <Fragment key={i}>
+            {group.items.map((message: MessageWithMemberWithProfile) => (
+              <div key={message.id}>{message.content}</div>
+            ))}
+          </Fragment>
+        ))}
+      </div>
     </div>
   );
 };
