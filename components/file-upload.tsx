@@ -31,7 +31,7 @@ export const FileUpload = ({ onChange, value, endpoint }: FileUploadProps) => {
   if (value && fileType === "pdf") {
     return (
       <div className="relative flex items-center p-2 mt-2 rounded-md bg-background/10">
-        <FileIcon className="h-10 w-10 fill-indigo-200" />
+        <FileIcon className="h-10 w-10 fill-indigo-200 stroke-indigo-400" />
         <a
           href={value}
           target="_blankk"
