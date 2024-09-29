@@ -10,7 +10,7 @@ interface ChatHeaderProps {
   imageUrl?: string;
 }
 
-const ChatHeader = ({ serverId, name, type, imageUrl }: ChatHeaderProps) => {
+export const ChatHeader = ({ serverId, name, type, imageUrl }: ChatHeaderProps) => {
   return (
     <div className="border-neutral-200 dark:border-neutral-800 border-b-2 text-md font-semibold flex items-center h-12 px-3">
       <MobileToggle serverId={serverId} />
@@ -31,5 +31,3 @@ const ChatHeader = ({ serverId, name, type, imageUrl }: ChatHeaderProps) => {
     </div>
   );
 };
-
-export default ChatHeader;
