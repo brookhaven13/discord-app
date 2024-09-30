@@ -1,13 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import qs from "query-string";
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { Edit, FileIcon, Trash } from "lucide-react";
 import { Member, MemberRole, Profile } from "@prisma/client";
+import { cn } from "@/lib/utils";
+import { roleIconMap } from "@/lib/icon-maps";
+
 import { UserAvatar } from "@/components/user-avatar";
 import { ActionTooltip } from "@/components/action-tooltip";
-import { roleIconMap } from "@/lib/icon-maps";
-import { cn } from "@/lib/utils";
+import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 interface ChatItemProps {
   id: string;
@@ -23,6 +31,10 @@ interface ChatItemProps {
   socketUrl: string;
   socketQuery: Record<string, string>;
 }
+
+const formSchema = z.object({
+  content: z.string().min(1),
+});
 
 export const ChatItem = ({
   id,
@@ -48,6 +60,21 @@ export const ChatItem = ({
   const canEdit = !deleted && isOwner && !fileUrl;
   const isPDF = fileType === "pdf" && fileUrl;
   const isImage = !isPDF && fileUrl;
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      content,
+    },
+  });
+
+  const onSubmit = (values) => {
+    console.log("submit");
+  };
+
+  useEffect(() => {
+    form.reset({ content });
+  }, [content, form]);
 
   return (
     <div className="relative group flex items-center p-4 w-full hover:bg-zinc-600/5 dark:hover:bg-black/5 transition">
@@ -115,13 +142,43 @@ export const ChatItem = ({
               )}
             </p>
           )}
+
+          {!fileUrl && isEditing && (
+            <Form {...form}>
+              <form
+                className="flex items-center gap-x-2 w-full pt-2"
+                onSubmit={form.handleSubmit(onSubmit)}
+              >
+                <FormField
+                  control={form.control}
+                  name="content"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormControl>
+                        <div className="relative w-full">
+                          <Input
+                            className="border-none border-0 bg-zinc-200/90 dark:bg-zinc-700/75 text-zinc-600 dark:text-zinc-200 p-2 focus-visible:ring-0 focus-visible:ring-offset-0"
+                            placeholder="Edited message"
+                            {...field}
+                          />
+                        </div>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </form>
+            </Form>
+          )}
         </div>
       </div>
       {canDelete && (
         <div className="hidden group-hover:flex items-center gap-x-2 absolute -top-2 right-5 p-1 bg-zinc-200 dark:bg-zinc-800 rounded-sm">
           {canEdit && (
             <ActionTooltip label="Edit">
-              <Edit className="cursor-pointer text-zinc-500 dark:text-zinc-400 h-4 w-4 ml-auto " />
+              <Edit
+                onClick={() => setIsEditing(true)}
+                className="cursor-pointer text-zinc-500 dark:text-zinc-400 h-4 w-4 ml-auto "
+              />
             </ActionTooltip>
           )}
           <ActionTooltip label="Delete">
