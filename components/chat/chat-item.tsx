@@ -60,21 +60,41 @@ export const ChatItem = ({
   const canEdit = !deleted && isOwner && !fileUrl;
   const isPDF = fileType === "pdf" && fileUrl;
   const isImage = !isPDF && fileUrl;
-
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       content,
     },
   });
+  
+  const isLoading = form.formState.isSubmitting;
 
-  const onSubmit = (values) => {
-    console.log("submit");
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    try {
+      const url = qs.stringifyUrl({
+        url: `${socketUrl}/${id}`,
+        query: socketQuery,
+      })
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   useEffect(() => {
     form.reset({ content });
   }, [content, form]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setIsEditing(false);
+      }
+
+      window.addEventListener("keydown", handleKeyDown);
+      return () => window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   return (
     <div className="relative group flex items-center p-4 w-full hover:bg-zinc-600/5 dark:hover:bg-black/5 transition">
@@ -160,13 +180,20 @@ export const ChatItem = ({
                             className="border-none border-0 bg-zinc-200/90 dark:bg-zinc-700/75 text-zinc-600 dark:text-zinc-200 p-2 focus-visible:ring-0 focus-visible:ring-offset-0"
                             placeholder="Edited message"
                             {...field}
+                            disabled={isLoading}
                           />
                         </div>
                       </FormControl>
                     </FormItem>
                   )}
                 />
+                <Button disabled={isLoading} size="sm" variant="primary">
+                  Save
+                </Button>
               </form>
+              <span className="text-[10px] text-zinc-400 mt-1">
+                Press escape to cancel, enter to save
+              </span>
             </Form>
           )}
         </div>
