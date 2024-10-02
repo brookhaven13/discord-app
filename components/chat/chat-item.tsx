@@ -1,5 +1,6 @@
 "use client";
 
+import axios from "axios";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import qs from "query-string";
@@ -10,6 +11,7 @@ import { Edit, FileIcon, Trash } from "lucide-react";
 import { Member, MemberRole, Profile } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import { roleIconMap } from "@/lib/icon-maps";
+import { useModal } from "@/hooks/use-modal-store";
 
 import { UserAvatar } from "@/components/user-avatar";
 import { ActionTooltip } from "@/components/action-tooltip";
@@ -49,7 +51,7 @@ export const ChatItem = ({
   socketQuery,
 }: ChatItemProps) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const { onOpen } = useModal();
 
   const fileType = fileUrl?.split(".").pop();
 
@@ -60,22 +62,27 @@ export const ChatItem = ({
   const canEdit = !deleted && isOwner && !fileUrl;
   const isPDF = fileType === "pdf" && fileUrl;
   const isImage = !isPDF && fileUrl;
-  
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       content,
     },
   });
-  
+
   const isLoading = form.formState.isSubmitting;
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       const url = qs.stringifyUrl({
         url: `${socketUrl}/${id}`,
         query: socketQuery,
-      })
+      });
+
+      await axios.patch(url, values);
+
+      form.reset();
+      setIsEditing(false);
     } catch (error) {
       console.error(error);
     }
@@ -209,7 +216,15 @@ export const ChatItem = ({
             </ActionTooltip>
           )}
           <ActionTooltip label="Delete">
-            <Trash className="cursor-pointer text-zinc-500 dark:text-zinc-400 h-4 w-4 ml-auto " />
+            <Trash
+              onClick={() =>
+                onOpen("deleteMessage", {
+                  apiUrl: `${socketUrl}/${id}`,
+                  query: socketQuery,
+                })
+              }
+              className="cursor-pointer text-zinc-500 dark:text-zinc-400 h-4 w-4 ml-auto "
+            />
           </ActionTooltip>
         </div>
       )}
