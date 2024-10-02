@@ -6,6 +6,8 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/provider/theme-provider";
 import { ModalProvider } from "@/components/provider/modal-provider";
+import { SocketProvider } from "@/components/provider/socket-provider";
+import { QueryProvider } from "@/components/provider/query-provider";
 
 const font = Open_Sans({ subsets: ["latin"] });
 
@@ -22,17 +24,19 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
-        <body className={cn(font.className,
-          "bg-white dark:bg-[#313338]",
-        )}>
+        <body className={cn(font.className, "bg-white dark:bg-[#313338]")}>
           <ThemeProvider
             attribute="class"
             defaultTheme="dark"
             enableSystem={false}
             storageKey="discord-theme"
           >
-            <ModalProvider />
-            {children}
+            <SocketProvider>
+              <ModalProvider />
+              <QueryProvider>
+                {children}
+              </QueryProvider>
+            </SocketProvider>
           </ThemeProvider>
         </body>
       </html>

@@ -43,7 +43,7 @@ const ServerIdPage = async ({
     return null;
   }
 
-  return redirect(`/servers/${params.serverId}/conversations/${initialChannel.id}`);
+  return redirect(`/servers/${params.serverId}/channels/${initialChannel.id}`);
 }
 
 export default ServerIdPage;
