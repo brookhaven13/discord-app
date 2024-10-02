@@ -4,7 +4,10 @@ import { Fragment } from "react";
 import { format } from "date-fns";
 import { Loader2, ServerCrash } from "lucide-react";
 import { Member, Message, Profile } from "@prisma/client";
+
 import { useChatQuery } from "@/hooks/use-chat-query";
+import { useChatSocket } from "@/hooks/use-chat-socket";
+
 import { ChatWelcome } from "@/components/chat/chat-welcome";
 import { ChatItem } from "@/components/chat/chat-item";
 
@@ -40,6 +43,8 @@ export const ChatMessages = ({
   type,
 }: ChatMessagesProps) => {
   const queryKey = `chat:${chatId}`;
+  const addKey = `chat:${chatId}:messages`;
+  const updateKey = `chat:${chatId}:messages:update`;
 
   const { data, fetchNextPage, isFetchingNextPage, status } = useChatQuery({
     queryKey,
@@ -48,6 +53,12 @@ export const ChatMessages = ({
     paramValue,
   });
 
+  useChatSocket({
+    queryKey,
+    addKey,
+    updateKey,
+  });
+  
   if (status === "pending") {
     return (
       <div className="flex flex-col flex-1 items-center justify-center">
