@@ -1,7 +1,7 @@
 "use client";
 
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import qs from "query-string";
 import * as z from "zod";
@@ -17,7 +17,9 @@ import { UserAvatar } from "@/components/user-avatar";
 import { ActionTooltip } from "@/components/action-tooltip";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { useParams, useRouter } from "next/navigation";
 
 interface ChatItemProps {
   id: string;
@@ -53,6 +55,9 @@ export const ChatItem = ({
   const [isEditing, setIsEditing] = useState(false);
   const { onOpen } = useModal();
 
+  const router = useRouter();
+  const params = useParams();
+
   const fileType = fileUrl?.split(".").pop();
 
   const isAdmin = currentMember.role === MemberRole.ADMIN;
@@ -71,21 +76,34 @@ export const ChatItem = ({
   });
 
   const isLoading = form.formState.isSubmitting;
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try {
-      const url = qs.stringifyUrl({
-        url: `${socketUrl}/${id}`,
-        query: socketQuery,
-      });
+  const onSubmit = useCallback(
+    async (values: z.infer<typeof formSchema>) => {
+      console.log("onSubmit");
+      try {
+        const url = qs.stringifyUrl({
+          url: `${socketUrl}/${id}`,
+          query: socketQuery,
+        });
 
-      await axios.patch(url, values);
+        await axios.patch(url, values);
 
-      form.reset();
-      setIsEditing(false);
-    } catch (error) {
-      console.error(error);
-    }
+        form.reset();
+        setIsEditing(false);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [form, id, socketQuery, socketUrl]
+  );
+
+  const onMemberClick = () => {
+    if (member.id === currentMember.id) return;
+
+    router.push(`/servers/${params?.serverId}/conversations/${member.id}`);
   };
 
   useEffect(() => {
@@ -97,22 +115,43 @@ export const ChatItem = ({
       if (e.key === "Escape") {
         setIsEditing(false);
       }
-
-      window.addEventListener("keydown", handleKeyDown);
-      return () => window.removeEventListener("keydown", handleKeyDown);
     };
-  }, []);
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [setIsEditing]);
+
+  useEffect(() => {
+    const handleSave = (e: KeyboardEvent) => {
+      if (
+        e.key === "Enter" &&
+        !e.shiftKey &&
+        e.target instanceof HTMLTextAreaElement &&
+        e.target.id === "chat-item-textarea"
+      ) {
+        e.preventDefault();
+        setIsSubmitting(true);
+        form.handleSubmit(onSubmit)();
+      }
+    };
+
+    window.addEventListener("keydown", handleSave);
+    return () => window.removeEventListener("keydown", handleSave);
+  }, [form, onSubmit]);
 
   return (
     <div className="relative group flex items-center p-4 w-full hover:bg-zinc-600/5 dark:hover:bg-black/5 transition">
       <div className="group flex gap-x-2 items-start w-full">
-        <div className="cursor-pointer hover:drop-shadow-md transition">
+        <div
+          onClick={() => onMemberClick()}
+          className="cursor-pointer hover:drop-shadow-md transition"
+        >
           <UserAvatar src={member.profile.imageUrl} />
         </div>
         <div className="flex flex-col w-full">
           <div className="flex items-center gap-x-2">
             <div className="flex items-center gap-1">
-              <p className="font-semibold text-sm hover:underline">
+              <p className="cursor-pointer font-semibold text-sm hover:underline">
                 {member.profile.name}
               </p>
               <ActionTooltip label={member.role}>
@@ -156,7 +195,7 @@ export const ChatItem = ({
           {!fileUrl && !isEditing && (
             <p
               className={cn(
-                "text-sm text-zinc-600 dark:text-zinc-300",
+                "text-sm text-zinc-600 dark:text-zinc-300 whitespace-pre-wrap break-words",
                 deleted &&
                   "italic text-zinc-500 dark:text-zinc-400 text-xs mt-1"
               )}
@@ -183,8 +222,9 @@ export const ChatItem = ({
                     <FormItem className="flex-1">
                       <FormControl>
                         <div className="relative w-full">
-                          <Input
-                            className="border-none border-0 bg-zinc-200/90 dark:bg-zinc-700/75 text-zinc-600 dark:text-zinc-200 p-2 focus-visible:ring-0 focus-visible:ring-offset-0"
+                          <Textarea
+                            id="chat-item-textarea"
+                            className="resize-none border-none border-0 bg-zinc-200/90 dark:bg-zinc-700/75 text-zinc-600 dark:text-zinc-200 p-2 focus-visible:ring-0 focus-visible:ring-offset-0"
                             placeholder="Edited message"
                             {...field}
                             disabled={isLoading}
