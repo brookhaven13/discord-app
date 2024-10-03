@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,6 +13,7 @@ import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { EmojiPicker } from "@/components/emoji-picker";
 import { useRouter } from "next/navigation";
+import { Textarea } from "../ui/textarea";
 
 interface ChatInputProps {
   apiUrl: string;
@@ -37,7 +39,7 @@ export const ChatInput = ({ apiUrl, query, name, type }: ChatInputProps) => {
 
   const isLoading = form.formState.isSubmitting;
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = useCallback(async (values: z.infer<typeof formSchema>) => {
     try {
       const url = qs.stringifyUrl({
         url: apiUrl,
@@ -51,7 +53,24 @@ export const ChatInput = ({ apiUrl, query, name, type }: ChatInputProps) => {
     } catch (error) {
       console.error(error);
     }
-  };
+  }, [apiUrl, form, query, router]);
+
+  useEffect(() => {
+    const handleSave = (e: KeyboardEvent) => {
+      if (
+        e.key === "Enter" &&
+        !e.shiftKey &&
+        e.target instanceof HTMLTextAreaElement &&
+        e.target.id === "chat-input-textarea"
+      ) {
+        e.preventDefault();
+        form.handleSubmit(onSubmit)();
+      }
+    };
+
+    window.addEventListener("keydown", handleSave);
+    return () => window.removeEventListener("keydown", handleSave);
+  }, [form, onSubmit]);
 
   return (
     <Form {...form}>
@@ -70,9 +89,22 @@ export const ChatInput = ({ apiUrl, query, name, type }: ChatInputProps) => {
                   >
                     <Plus className="text-white dark:text-[#313338]" />
                   </button>
-                  <Input
+                  {/* <Input
                     disabled={isLoading}
                     className="bg-zinc-200/90 dark:bg-zinc-700/75 border-none px-14 py-6 focus-visible:ring-0 focus-visible:ring-offset-0 text-zinc-600 dark:text-zinc-200"
+                    placeholder={`Message ${
+                      type === "conversation" ? "name" : "#" + name
+                    }`}
+                    {...field}
+                  /> */}
+                  <Textarea
+                    id="chat-input-textarea"
+                    disabled={isLoading}
+                    className="bg-zinc-200/90 dark:bg-zinc-700/75 
+                    resize-none border-none 
+                    px-14 py-3 h-5
+                    focus-visible:ring-0 focus-visible:ring-offset-0 
+                    text-zinc-600 dark:text-zinc-200"
                     placeholder={`Message ${
                       type === "conversation" ? "name" : "#" + name
                     }`}
