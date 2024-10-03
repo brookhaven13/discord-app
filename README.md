@@ -17,10 +17,10 @@ This project aims to create a feature-rich clone of the Discord web application.
 ## Tech Stack
 
 -   **Frontend:** React.js, Redux, WebSocket
--   **Backend:** Node.js, Express.js
--   **Database:** MongoDB
+-   **Backend:** Next.js with Prisma
+-   **Database:** postgreSQL, Supabase
 -   **Real-time communication:** Socket.io
--   **Authentication:** JWT (JSON Web Tokens)
+-   **Authentication:** Clerk
 
 ## Learning Objectives
 
