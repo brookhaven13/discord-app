@@ -76,22 +76,29 @@ export const ChatItem = ({
   });
 
   const isLoading = form.formState.isSubmitting;
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try {
-      const url = qs.stringifyUrl({
-        url: `${socketUrl}/${id}`,
-        query: socketQuery,
-      });
+  const onSubmit = useCallback(
+    async (values: z.infer<typeof formSchema>) => {
+      console.log("onSubmit");
+      try {
+        const url = qs.stringifyUrl({
+          url: `${socketUrl}/${id}`,
+          query: socketQuery,
+        });
 
-      await axios.patch(url, values);
+        await axios.patch(url, values);
 
-      form.reset();
-      setIsEditing(false);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+        form.reset();
+        setIsEditing(false);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [form, id, socketQuery, socketUrl]
+  );
 
   const onMemberClick = () => {
     if (member.id === currentMember.id) return;
@@ -108,16 +115,29 @@ export const ChatItem = ({
       if (e.key === "Escape") {
         setIsEditing(false);
       }
-
-      // if (e.key === "Enter" && !e.shiftKey) {
-      //   e.preventDefault();
-      //   form.handleSubmit(onSubmit);
-      // }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [setIsEditing]);
+
+  useEffect(() => {
+    const handleSave = (e: KeyboardEvent) => {
+      if (
+        e.key === "Enter" &&
+        !e.shiftKey &&
+        e.target instanceof HTMLTextAreaElement &&
+        e.target.id === "chat-item-textarea"
+      ) {
+        e.preventDefault();
+        setIsSubmitting(true);
+        form.handleSubmit(onSubmit)();
+      }
+    };
+
+    window.addEventListener("keydown", handleSave);
+    return () => window.removeEventListener("keydown", handleSave);
+  }, [form, onSubmit]);
 
   return (
     <div className="relative group flex items-center p-4 w-full hover:bg-zinc-600/5 dark:hover:bg-black/5 transition">
@@ -203,6 +223,7 @@ export const ChatItem = ({
                       <FormControl>
                         <div className="relative w-full">
                           <Textarea
+                            id="chat-item-textarea"
                             className="resize-none border-none border-0 bg-zinc-200/90 dark:bg-zinc-700/75 text-zinc-600 dark:text-zinc-200 p-2 focus-visible:ring-0 focus-visible:ring-offset-0"
                             placeholder="Edited message"
                             {...field}

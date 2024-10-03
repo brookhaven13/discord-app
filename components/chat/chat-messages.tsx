@@ -7,10 +7,10 @@ import { Member, Message, Profile } from "@prisma/client";
 
 import { useChatQuery } from "@/hooks/use-chat-query";
 import { useChatSocket } from "@/hooks/use-chat-socket";
+import { useChatScroll } from "@/hooks/use-chat-scroll";
 
 import { ChatWelcome } from "@/components/chat/chat-welcome";
 import { ChatItem } from "@/components/chat/chat-item";
-import { useChatScroll } from "@/hooks/use-chat-scroll";
 
 interface ChatMessagesProps {
   name: string;

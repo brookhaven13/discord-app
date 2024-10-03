@@ -36,7 +36,7 @@ export const useChatScroll = ({
     };
   }, [chatRef, loadMore, shouldLoadMore]);
   
-  
+  // This useEffect hook will scroll to the bottom of the chat when the chat is first loaded
   useEffect(() => {
     const bottomDiv = bottomRef?.current;
     const topDiv = chatRef?.current;
@@ -59,5 +59,5 @@ export const useChatScroll = ({
         bottomRef.current?.scrollIntoView({ behavior: "smooth" });
       }, 100);
     }
-  }, [bottomRef, chatRef, hasInitialScroll]);
+  }, [bottomRef, chatRef, hasInitialScroll, count]);
 };
