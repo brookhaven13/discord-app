@@ -1,7 +1,7 @@
 "use client";
 
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import qs from "query-string";
 import * as z from "zod";
@@ -17,6 +17,7 @@ import { UserAvatar } from "@/components/user-avatar";
 import { ActionTooltip } from "@/components/action-tooltip";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useParams, useRouter } from "next/navigation";
 
@@ -96,7 +97,7 @@ export const ChatItem = ({
     if (member.id === currentMember.id) return;
 
     router.push(`/servers/${params?.serverId}/conversations/${member.id}`);
-  }
+  };
 
   useEffect(() => {
     form.reset({ content });
@@ -108,10 +109,15 @@ export const ChatItem = ({
         setIsEditing(false);
       }
 
-      window.addEventListener("keydown", handleKeyDown);
-      return () => window.removeEventListener("keydown", handleKeyDown);
+      // if (e.key === "Enter" && !e.shiftKey) {
+      //   e.preventDefault();
+      //   form.handleSubmit(onSubmit);
+      // }
     };
-  }, []);
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [setIsEditing]);
 
   return (
     <div className="relative group flex items-center p-4 w-full hover:bg-zinc-600/5 dark:hover:bg-black/5 transition">
@@ -125,9 +131,7 @@ export const ChatItem = ({
         <div className="flex flex-col w-full">
           <div className="flex items-center gap-x-2">
             <div className="flex items-center gap-1">
-              <p
-                className="cursor-pointer font-semibold text-sm hover:underline"
-              >
+              <p className="cursor-pointer font-semibold text-sm hover:underline">
                 {member.profile.name}
               </p>
               <ActionTooltip label={member.role}>
@@ -171,7 +175,7 @@ export const ChatItem = ({
           {!fileUrl && !isEditing && (
             <p
               className={cn(
-                "text-sm text-zinc-600 dark:text-zinc-300",
+                "text-sm text-zinc-600 dark:text-zinc-300 whitespace-pre-wrap break-words",
                 deleted &&
                   "italic text-zinc-500 dark:text-zinc-400 text-xs mt-1"
               )}
@@ -198,8 +202,8 @@ export const ChatItem = ({
                     <FormItem className="flex-1">
                       <FormControl>
                         <div className="relative w-full">
-                          <Input
-                            className="border-none border-0 bg-zinc-200/90 dark:bg-zinc-700/75 text-zinc-600 dark:text-zinc-200 p-2 focus-visible:ring-0 focus-visible:ring-offset-0"
+                          <Textarea
+                            className="resize-none border-none border-0 bg-zinc-200/90 dark:bg-zinc-700/75 text-zinc-600 dark:text-zinc-200 p-2 focus-visible:ring-0 focus-visible:ring-offset-0"
                             placeholder="Edited message"
                             {...field}
                             disabled={isLoading}

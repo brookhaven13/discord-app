@@ -20,7 +20,7 @@ export const useChatSocket = ({
   updateKey,
   queryKey,
 }: ChatSocketProps) => {
-  const { socket, isConnected } = useSocket();
+  const { socket } = useSocket();
   const queryClient = useQueryClient();
 
   useEffect(() => {
