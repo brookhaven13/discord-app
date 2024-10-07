@@ -3,6 +3,8 @@
 
 This project aims to create a feature-rich clone of the Discord web application. My goal is to recreate the core functionality and user experience of Discord while providing developers with an opportunity to learn and practice full-stack web development.
 
+### I would recommend visiting the demo site on a PC instead of a mobile phone since the clerk user avatar component is not mobile-friendly. Please note that you will not be able to click the logout button on mobile devices.
+
 ## Key Features
 
 -   User authentication system (sign up, login, logout)
