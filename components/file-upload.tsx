@@ -7,7 +7,8 @@ import { UploadDropzone } from "@/lib/uploadting";
 interface FileUploadProps {
   onChange: (url?: string) => void;
   value: string;
-  endpoint: "messageFile" | "serverImage";
+  endpoint: "messageFile" | "serverImage" | "imageUploader";
+  // endpoint: string;
 }
 
 export const FileUpload = ({ onChange, value, endpoint }: FileUploadProps) => {
@@ -53,7 +54,7 @@ export const FileUpload = ({ onChange, value, endpoint }: FileUploadProps) => {
 
   return (
     <UploadDropzone
-      endpoint={endpoint}
+      endpoint={"imageUploader"}
       onClientUploadComplete={(res) => onChange(res?.[0].url)}
       onUploadError={(error: Error) => console.log(error)}
     />
